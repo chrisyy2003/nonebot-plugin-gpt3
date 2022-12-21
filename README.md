@@ -83,12 +83,14 @@ _✨ 基于openai GPT3官方API的对话插件 ✨_
 
 ```
 nb plugin install nonebot-plugin-gpt3
+playwright install # 如果已经安装了playwright则请忽略
 ```
 
 2.   通过包管理器安装，可以通过nb，pip3，或者poetry等方式安装，以pip为例
 
 ```
-pip install nonebot-plugin-gpt3
+pip install nonebot-plugin-gpt3 playwright -U
+playwright install # 如果已经安装了playwright则请忽略
 ```
 
 随后在`bot.py`中加上如下代码，加载插件
