@@ -36,20 +36,24 @@ _✨ 基于openai GPT3官方API的对话插件 ✨_
 
 私聊中是直接发送消息，**群聊中是以回复的方式发送。**
 
-## 功能列表
+以下是功能列表
 
-|                 指令                  |      需要@      |            描述            |
-| :-----------------------------------: | :-------------: | :------------------------: |
-|             刷新/重置对话             |       是        | 重置会话记录，开始新的对话 |
-|               重置人格                |       是        |         重置AI人格         |
-|               设置人格                |       是        |         设置AI人格         |
-|           导出会话/导出对话           |       是        |        导出历史会话        |
-| **自定义的指令前缀（默认【.】触发）** | 自定义是否需要@ |       基本的聊天对话       |
-|        **chat/聊天/开始聊天**         |       是        |        开始连续对话        |
-|        **stop/结束/结束聊天**         |       否        |      结束连续聊天模式      |
-|         图片渲染（默认关闭）          |    被动触发     |       结果渲染为图片       |
+|            功能            |           指令            |
+| :------------------------: | :-----------------------: |
+| 重置会话记录，开始新的对话 |       刷新/重置对话       |
+|         重置AI人格         |         重置人格          |
+|         设置AI人格         |         设置人格          |
+|        导出历史会话        |     导出会话/导出对话     |
+|     **基本的聊天对话**     | 基本会话（默认【.】触发） |
+|        **连续对话**        |    chat/聊天/开始聊天     |
+|    **结束连续聊天模式**    |    stop/结束/结束聊天     |
+|       回答渲染为图片       |   图片渲染（默认关闭）    |
 
+## 基本会话
 
+对话前，加上前缀即可与GPT3对话。
+
+​	![image-20221221203808576](https://chrisyy-images.oss-cn-chengdu.aliyuncs.com/img/image-20221221203808576.png)
 
 ## 连续会话
 
@@ -78,13 +82,13 @@ _✨ 基于openai GPT3官方API的对话插件 ✨_
 1.  使用 nb-cli
 
 ```
-nb plugin install nonebot_plugin_gpt3
+nb plugin install nonebot-plugin-gpt3
 ```
 
 2.   通过包管理器安装，可以通过nb，pip3，或者poetry等方式安装，以pip为例
 
 ```
-pip install nonebot_plugin_gpt3
+pip install nonebot-plugin-gpt3
 ```
 
 随后在`bot.py`中加上如下代码，加载插件
@@ -93,25 +97,29 @@ pip install nonebot_plugin_gpt3
 nonebot.load_plugin('nonebot_plugin_gpt3')
 ```
 
+**windows用户还需要安装一个rust环境，[点击这里下载安装](https://file.chrisyy.top/rustup-setup.exe)。**
+
 # 配置
 
-对于官方openai接口只需配置API Keys即可，所以请填写API在您配置的`chatgpt_token_path`下面，默认路径是`config/chatgpt_img_config.yml`
+对于官方openai接口只需配置API Keys即可，所以请填写API在您配置的`chatgpt_token_path`下面，默认路径是`config/chatgpt_api_key.yml`
 
 文件内格式如下，有多个Key请按照如下格式配置。
 
 ```
-api_keys:
-  - XXX
-  - YYY
+api_keys: [
+	XXX,
+	YYY
+]
 ```
 
 之后是一些自定义配置，根据注释可以自行修改，如果需要配置请在`env.dev`下进行配置。
 
 ```
-chatgpt_api_key_path = "config/chatgpt_api.yml" # api文件
-chatgpt_command_prefix = "."                    # 触发聊天的前缀
-chatgpt_need_at = False                         # 是否需要@
-chatgpt_image_render = True                     # 是否需要图片渲染
-chatgpt_image_limit = 100                       # 长度超过多少才会渲染成图片
+gpt3_api_key_path = "config/chatgpt_api_key.yml"   # api文件的路径
+gpt3_command_prefix = "."                          # 基本会话中的指令前缀
+gpt3_need_at = False                               # 是否需要@才触发命令
+gpt3_image_render = True                           # 是否渲染为图片
+gpt3_image_limit = 100                             # 长度超过多少才会渲染成图片
+gpt3_max_tokens = 400                              # 最大返回值长度
 ```
 
