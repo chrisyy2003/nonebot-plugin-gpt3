@@ -7,7 +7,7 @@ readme = "README.md"
 packages = [{include = "nonebot_plugin_gpt3"}]
 
 [tool.poetry.dependencies]
-python = "^3.10"
+python = "^3.8"
 nonebot2 = "^2.0.0rc2"
 nonebot-adapter-onebot = "^2.1.5"
 
