@@ -113,7 +113,6 @@ from nonebot_plugin_htmlrender import md_to_pic
 reset_c = on_command("重置会话", aliases={"刷新", "重置"},priority=10, block=True, **need_at)
 @reset_c.handle()
 async def _(matcher: Matcher, event: MessageEvent, arg: Message = CommandArg()):
-    print(Message)
     session_id = event.get_session_id()
     msg = arg.extract_plain_text().strip()
     get_user_session(session_id).reset()
