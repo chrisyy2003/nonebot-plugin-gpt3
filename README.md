@@ -78,6 +78,8 @@ _✨ 基于openai GPT3官方API的对话插件 ✨_
 
 <img src="https://chrisyy-images.oss-cn-chengdu.aliyuncs.com/img/image-20230118161015957.png" width="40%"/>
 
+切换群聊到702280361
+
 <img src="https://chrisyy-images.oss-cn-chengdu.aliyuncs.com/img/image-20230118161509269.png" width="40%"/>
 
 
