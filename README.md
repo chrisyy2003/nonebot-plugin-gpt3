@@ -54,32 +54,34 @@ _✨ 基于openai GPT3官方API的对话插件 ✨_
 
 对话前，加上**默认前缀**即可与GPT3对话。
 
-<img src="https://chrisyy-images.oss-cn-chengdu.aliyuncs.com/img/image-20230118155505182.png" style="zoom:50%" />
+<img src="https://chrisyy-images.oss-cn-chengdu.aliyuncs.com/img/image-20230118155505182.png" width="40%" />
 
 ## 连续会话
 
 输入**chat/聊天/开始聊天**即可不加前缀，连续的对话，输入**结束/结束聊天**，即可结束聊天
 
-<img src="https://chrisyy-images.oss-cn-chengdu.aliyuncs.com/img/image-20221217230058979.png" style="zoom:50%" />
+<img src="https://chrisyy-images.oss-cn-chengdu.aliyuncs.com/img/image-20221217230058979.png" width="40%" />
 
 ## 人格设置
 
 预设了**AI助手/猫娘/nsfw猫娘**三种人格，可以通过人格设置切换。内置的设定可以从[这里看到](https://github.com/chrisyy2003/lingyin-bot/blob/main/plugins/gpt3/nonebot_plugin_gpt3/__init__.py#L16-L18)。
 
-<img src="https://chrisyy-images.oss-cn-chengdu.aliyuncs.com/img/image-20221217231703614.png" style="zoom:50%" />
+<img src="https://chrisyy-images.oss-cn-chengdu.aliyuncs.com/img/image-20221217231703614.png" width="40%" />
 
 同样也可以手动指定人格
 
-<img src="https://chrisyy-images.oss-cn-chengdu.aliyuncs.com/img/image-20221217232155100.png" style="zoom:50%" />
+<img src="https://chrisyy-images.oss-cn-chengdu.aliyuncs.com/img/image-20221217232155100.png" width="40%" />
 
 ## 切换群聊
 
 命令切换+群号即可保留聊天信息并切换群聊。
 
-<center class="half">
-    <img src="https://chrisyy-images.oss-cn-chengdu.aliyuncs.com/img/image-20230118161015957.png" width="300"/>
-    <img src="https://chrisyy-images.oss-cn-chengdu.aliyuncs.com/img/image-20230118161509269.png" width="300"/>
-</center>
+<img src="https://chrisyy-images.oss-cn-chengdu.aliyuncs.com/img/image-20230118161015957.png" width="40%"/>
+
+<img src="https://chrisyy-images.oss-cn-chengdu.aliyuncs.com/img/image-20230118161509269.png" width="40%"/>
+
+
+
 
 ## 图片渲染
 
