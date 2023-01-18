@@ -89,7 +89,7 @@ _✨ 基于openai GPT3官方API的对话插件 ✨_
 
 图片渲染可以在配置文件中选择配置是否需要渲染。
 
-<img src="https://chrisyy-images.oss-cn-chengdu.aliyuncs.com/img/image-20221217233729263.png" style="zoom:50%" />
+<img src="https://chrisyy-images.oss-cn-chengdu.aliyuncs.com/img/image-20221217233729263.png" width="40%" />
 
 # 安装
 
