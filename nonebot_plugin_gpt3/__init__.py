@@ -184,7 +184,7 @@ async def _(matcher: Matcher, event: MessageEvent):
 #     await matcher.finish('导入成功', at_sender=True)
 
 
-switch = on_command("切换会话", aliases={"切换"}, priority=10, block=True, **need_at)
+switch = on_command("切换会话", aliases={"切换会话", "切换"}, priority=10, block=True, **need_at)
 
 
 @switch.handle()
