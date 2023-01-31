@@ -148,18 +148,20 @@ async def _(matcher: Matcher, event: MessageEvent):
     await matcher.finish("人格已重置")
 
 
-set_preset = on_command("设置人格", aliases={"人格设置"}, priority=10, block=True, **need_at)
+set_preset = on_command("设置人格", aliases={"人格设置", "人格"}, priority=10, block=True, permission=SUPERUSER, **need_at)
 
 
 @set_preset.handle()
 async def _(matcher: Matcher, event: MessageEvent, arg: Message = CommandArg()):
-    session_id = event.get_session_id()
     msg = arg.extract_plain_text().strip()
     if not msg:
         await matcher.finish("人格不能为空")
 
-    get_user_session(session_id).set_preset(msg)
-    await matcher.finish("设置成功")
+    global default_preset
+    default_preset = msg
+
+    # get_user_session(session_id).set_preset(msg)
+    await matcher.finish("全局人格设置成功")
 
 
 dump = on_command("导出会话", aliases={"导出"}, priority=10, block=True, **need_at)
