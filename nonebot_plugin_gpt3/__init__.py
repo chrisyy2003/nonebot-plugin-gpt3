@@ -17,6 +17,10 @@ nsfw_cat_preset = '以下是与一只可爱的发情猫娘的对话。猫娘是�
 
 api_index = -1
 
+# 公共模式
+public_mode = False
+public_sessionID = 1
+
 
 class Session:
     def __init__(self, id):
@@ -33,15 +37,15 @@ class Session:
         self.preset = default_preset
 
     # 设置人格
-    def set_preset(self, msg: str):
+    def set_preset(self, msg: str) -> str:
         if msg == '猫娘':
             self.preset = cat_preset
         elif msg == 'nsfw猫娘':
             self.preset = nsfw_cat_preset
         else:
             self.preset = msg.strip() + '\n'
-
         self.reset()
+        return self.preset
 
     # 导入用户会话
     # def load_user_session(self, msg):
@@ -95,13 +99,20 @@ class Session:
 
 
 user_session = {}
+
+# 注册公共会话
+user_session[public_sessionID] = Session(public_sessionID)
 user_lock = {}
 
 
 def get_user_session(user_id) -> Session:
     if user_id not in user_session:
         user_session[user_id] = Session(user_id)
-    return user_session[user_id]
+
+    if public_mode:
+        return user_session[public_sessionID]
+    else:
+        return user_session[user_id]
 
 
 async def handle_msg(resp: str) -> str or MessageSegment:
@@ -114,6 +125,29 @@ async def handle_msg(resp: str) -> str or MessageSegment:
         return MessageSegment.image(img)
     else:
         return resp
+
+def checker(event: GroupMessageEvent):
+    return not event.sender.role == "member"
+
+switch_mode = on_command("切换会话模式", aliases={"切换模式", "全局会话"}, priority=10, block=True, **need_at)
+
+@switch_mode.handle()
+async def _(matcher: Matcher, event: MessageEvent):
+    if not checker(event):
+        return
+
+    global public_mode
+    public_mode = not public_mode
+
+    get_user_session(public_sessionID).reset()
+    get_user_session(public_sessionID).reset_preset()
+
+    if public_mode:
+        await matcher.finish('已切换为全局会话')
+    else:
+        await matcher.finish('已关闭全局会话')
+
+
 
 switch_img = on_command("切换渲染", priority=10, block=True, permission=SUPERUSER, **need_at)
 
@@ -134,17 +168,32 @@ reset_c = on_command("重置会话", aliases={"刷新", "重置"}, priority=10, 
 @reset_c.handle()
 async def _(matcher: Matcher, event: MessageEvent):
     session_id = event.get_session_id()
-    get_user_session(session_id).reset()
+
+    if public_mode:
+        if not checker(event):
+            await matcher.finish("公共模式下，仅管理员可以重置会话")
+        get_user_session(public_sessionID).reset()
+    else:
+        get_user_session(session_id).reset()
     await matcher.finish("会话已重置")
 
+reset = on_command("当前人格", priority=10, block=True, **need_at)
+@reset.handle()
+async def _(matcher: Matcher, event: MessageEvent):
+    await matcher.finish(get_user_session(public_sessionID).preset)
 
 reset = on_command("重置人格", priority=10, block=True, **need_at)
-
-
 @reset.handle()
 async def _(matcher: Matcher, event: MessageEvent):
     session_id = event.get_session_id()
-    get_user_session(session_id).reset_preset()
+
+    if public_mode:
+        if not checker(event):
+            await matcher.finish("公共模式下，仅管理员可以重置人格")
+        get_user_session(public_sessionID).reset_preset()
+    else:
+        get_user_session(session_id).reset_preset()
+
     await matcher.finish("人格已重置")
 
 
@@ -158,9 +207,8 @@ async def _(matcher: Matcher, event: MessageEvent, arg: Message = CommandArg()):
         await matcher.finish("人格不能为空")
 
     global default_preset
-    default_preset = msg
+    default_preset = get_user_session(public_sessionID).set_preset(msg)
 
-    # get_user_session(session_id).set_preset(msg)
     await matcher.finish("全局人格设置成功")
 
 
@@ -171,19 +219,6 @@ dump = on_command("导出会话", aliases={"导出"}, priority=10, block=True, *
 async def _(matcher: Matcher, event: MessageEvent):
     session_id = event.get_session_id()
     await matcher.finish(MessageSegment.reply(event.message_id) + get_user_session(session_id).dump_user_session())
-
-
-# load = on_command("导入会话", aliases={"导入"}, priority=10, block=True, **need_at)
-#
-#
-# @load.handle()
-# async def _(matcher: Matcher, event: MessageEvent, arg: Message = CommandArg()):
-#     session_id = event.get_session_id()
-#     msg = arg.extract_plain_text().strip()
-#     if not msg:
-#         return
-#     get_user_session(session_id).load_user_session(msg)
-#     await matcher.finish('导入成功', at_sender=True)
 
 
 switch = on_command("切换会话", aliases={"切换会话", "切换"}, priority=10, block=True, **need_at)
@@ -255,7 +290,7 @@ async def _(args: Message = CommandArg()):
 
 
 @chat_gpt3.got("prompt", prompt="聊天开始...")
-async def handle_city(event: MessageEvent, prompt: Message = Arg(), msg: str = ArgPlainText("prompt")):
+async def handle_chat(event: MessageEvent, prompt: Message = Arg(), msg: str = ArgPlainText("prompt")):
     session_id = event.get_session_id()
 
     if msg in reset_p:
