@@ -2,7 +2,7 @@ import asyncio
 from typing import Awaitable
 
 import openai
-from .config import gpt3_max_tokens
+from .config import gpt3_max_tokens, gpt3_model
 
 start_sequence = "\nAI:"
 restart_sequence = "\nHuman: "
@@ -11,7 +11,7 @@ def get_chat_response(key, msg) -> str:
     openai.api_key = key
     try:
         response : str = openai.Completion.create(
-            model="text-davinci-003",
+            model=gpt3_model,
             prompt=msg,
             temperature=0.6,
             max_tokens=gpt3_max_tokens,

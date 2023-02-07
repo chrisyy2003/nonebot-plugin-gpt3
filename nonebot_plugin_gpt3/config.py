@@ -12,6 +12,7 @@ class Config(BaseSettings):
     gpt3_image_render: bool = False
     gpt3_image_limit: int = 100
     gpt3_max_tokens: int = 400
+    gpt3_model : str = 'text-davinci-003'
 
 
     class Config:
@@ -27,7 +28,7 @@ gpt3_need_at = config.gpt3_need_at
 gpt3_image_render = config.gpt3_image_render
 gpt3_image_limit = config.gpt3_image_limit
 gpt3_max_tokens = config.gpt3_max_tokens
-
+gpt3_model = config.gpt3_model
 
 # 如果不存在则创建
 LOCAL = Path() / "config"
