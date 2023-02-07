@@ -99,9 +99,9 @@ class Session:
 
 
 user_session = {}
-
 # 注册公共会话
 user_session[public_sessionID] = Session(public_sessionID)
+
 user_lock = {}
 
 
@@ -206,6 +206,9 @@ async def _(matcher: Matcher, event: MessageEvent, arg: Message = CommandArg()):
     if not msg:
         await matcher.finish("人格不能为空")
 
+    global user_session
+    user_session = {}
+    
     global default_preset
     default_preset = get_user_session(public_sessionID).set_preset(msg)
 
