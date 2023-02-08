@@ -139,7 +139,7 @@ gpt3_max_tokens = 400                              # 返回回答的最大长度
 
 ## 图片渲染
 
-如果需要开启图片渲染，请在配置文件中，配置`gpt3_need_at = True  `
+如果需要开启图片渲染，请在配置文件中，配置`gpt3_image_render = True  `
 
 并安装`playwright`，如果已经安装了`playwright`则请忽略
 
