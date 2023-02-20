@@ -7,6 +7,7 @@ from pathlib import Path
 class Config(BaseSettings):
     # Your Config Here
     gpt3_api_key_path: str = "config/chatgpt_api_key.yml"
+    gpt3_api_key_list_from_env: list = ''
     gpt3_command_prefix: str = 'gpt3'
     gpt3_need_at: bool = False
     gpt3_image_render: bool = False
@@ -29,6 +30,7 @@ gpt3_image_render = config.gpt3_image_render
 gpt3_image_limit = config.gpt3_image_limit
 gpt3_max_tokens = config.gpt3_max_tokens
 gpt3_model = config.gpt3_model
+gpt3_api_key_list_from_env = config.gpt3_api_key_list_from_env
 
 # 如果不存在则创建
 LOCAL = Path() / "config"
