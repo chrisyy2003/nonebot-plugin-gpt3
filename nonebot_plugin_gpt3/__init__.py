@@ -62,9 +62,6 @@ class Session:
     async def get_chat_response(self, msg) -> str:
         if len(api_key_list) == 0:
             return f'无API Keys，请在 {gpt3_api_key_path} 中配置'
-                
-            
-        
 
         if len(self.conversation):
             prompt = self.preset + ''.join(self.conversation) + msg
