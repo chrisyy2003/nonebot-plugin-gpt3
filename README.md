@@ -126,6 +126,16 @@ api_keys: [
 ]
 ```
 
+或使用.env配置(环境变量也可)配置, 优先级config/chatgpt_api_key --> 环境变量 --> .env
+eg1.
+```
+GPT3_API_KEY_LIST_FROM_ENV=["xxx","yyy"]
+```
+eg2. (Linux)
+```
+export GPT3_API_KEY_LIST_FROM_ENV=["xxx","yyy"]
+```
+
 之后是一些自定义配置，根据注释可以自行修改，如果需要请在对应的配置文件下进行配置。
 
 ```
