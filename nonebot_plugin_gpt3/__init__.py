@@ -61,10 +61,8 @@ class Session:
     # 会话
     async def get_chat_response(self, msg) -> str:
         if len(api_key_list) == 0:
-            if len(gpt3_api_key_list_from_env) == 0:
-                return f'无API Keys，请在 {gpt3_api_key_path} 中配置'
-            else:
-                api_key_list=gpt3_api_key_list_from_env
+            return f'无API Keys，请在 {gpt3_api_key_path} 中配置'
+                
             
         
 
