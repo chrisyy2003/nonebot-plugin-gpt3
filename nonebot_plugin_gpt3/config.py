@@ -48,7 +48,7 @@ with open(gpt3_api_key_path, 'r', encoding='utf-8') as f:
     if len(api_key_list) == 0:
         api_key_list = gpt3_api_key_list_from_env
 from nonebot.log import logger
-logger.info(f"加载 {len(api_key_list)}个 APIKeys")
+logger.info(f"加载 {len(api_key_list)}个 APIKeys {api_key_list}")
 
 # 基本会话
 matcher_params = {}
