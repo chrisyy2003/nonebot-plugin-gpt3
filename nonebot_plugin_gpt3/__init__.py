@@ -4,6 +4,7 @@ from nonebot import on_command
 from nonebot.adapters.onebot.v11 import Message, MessageEvent, PrivateMessageEvent, MessageSegment, GroupMessageEvent
 from nonebot.params import Arg, ArgPlainText, CommandArg, Matcher
 from nonebot.permission import SUPERUSER
+import time
 
 tokenizer = GPT2TokenizerFast.from_pretrained("gpt2")
 
@@ -24,7 +25,8 @@ public_sessionID = 1
 
 
 class Session:
-    chat_count: int = 0
+    chat_count: int = 1
+    last_timestamp: int = 0
     def __init__(self, id):
         self.session_id = id
         self.preset = default_preset
@@ -63,11 +65,31 @@ class Session:
         return self.preset + restart_sequence + ''.join(self.conversation)
 
     # 会话
-    async def get_chat_response(self, msg) -> str:
+    async def get_chat_response(self, msg, is_admin) -> str:
+        logger.error(f"{is_admin} {self.chat_count}")
+
         if len(api_key_list) == 0:
             return f'无API Keys，请在 {gpt3_api_key_path} 或者环境变量中配置'
-        if self.chat_count > gpt3_chat_count_per_day:
+
+        def check_and_reset() -> bool:
+            if is_admin:
+                return False
+            # 超过一天重置
+            from datetime import datetime
+            last = datetime.fromtimestamp(self.last_timestamp)
+            now = datetime.fromtimestamp(time.time())
+            delta = now - last
+            if delta.days > 0:
+                self.chat_count = 0
+
+            # 一天之内检查次数
+            if self.chat_count >= gpt3_chat_count_per_day:
+                return True
+            return False
+
+        if check_and_reset():
             return f'每日聊天次数达到上限'
+
 
         if len(self.conversation):
             prompt = self.preset + ''.join(self.conversation) + msg
@@ -98,6 +120,7 @@ class Session:
         if ok:
             self.conversation.append(f"{msg}{start_sequence}{res}{restart_sequence}")
             self.chat_count += 1
+            self.last_timestamp = time.time()
         else:
             # 超出长度或者错误自动重置
             self.reset()
@@ -132,7 +155,7 @@ async def handle_msg(resp: str) -> str or MessageSegment:
     else:
         return resp
 
-def checker(event: GroupMessageEvent):
+def checker(event: GroupMessageEvent) -> bool:
     return not event.sender.role == "member"
 
 switch_mode = on_command("全局会话", priority=10, block=True, **need_at)
@@ -271,7 +294,7 @@ async def _(matcher: Matcher, event: MessageEvent, arg: Message = CommandArg()):
         await matcher.finish("消息太快啦～请稍后", at_sender=True)
 
     user_lock[session_id] = True
-    resp = await get_user_session(session_id).get_chat_response(msg)
+    resp = await get_user_session(session_id).get_chat_response(msg, checker(event))
     resp = await handle_msg(resp)
 
     # 发送消息
