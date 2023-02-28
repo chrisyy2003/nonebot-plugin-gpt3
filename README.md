@@ -126,12 +126,13 @@ api_keys: [
 ]
 ```
 
-或使用.env配置(环境变量也可)配置, 优先级config/chatgpt_api_key --> 环境变量 --> .env
-eg1.
+此外可以通过`.env`文件或者环境变量配置, 优先级分别是`config/chatgpt_api_key` --> 环境变量 --> `.env`
+eg1. (`.env文件`)
+
 ```
 GPT3_API_KEY_LIST_FROM_ENV=["xxx","yyy"]
 ```
-eg2. (Linux)
+eg2. (Linux 环境变量)
 ```
 export GPT3_API_KEY_LIST_FROM_ENV=["xxx","yyy"]
 ```
@@ -139,12 +140,13 @@ export GPT3_API_KEY_LIST_FROM_ENV=["xxx","yyy"]
 之后是一些自定义配置，根据注释可以自行修改，如果需要请在对应的配置文件下进行配置。
 
 ```
-gpt3_api_key_path = "config/chatgpt_api_key.yml"   # api keys文件路径
-gpt3_command_prefix = "gpt3"                       # 基本触发命令
+gpt3_api_key_path = "config/chatgpt_api_key.yml"   # api文件的路径
+gpt3_command_prefix = "gpt3"                       # 基本会话中的指令前缀
 gpt3_need_at = False                               # 是否需要@才触发命令
-gpt3_image_render = True                           # 是否需要将回答渲染为图片
-gpt3_image_limit = 100                             # 长度超过多少才会渲染成图片
-gpt3_max_tokens = 400                              # 返回回答的最大长度
+gpt3_image_render = False                          # 是否渲染为图片
+gpt3_image_limit = 10                              # 长度超过多少才会渲染成图片
+gpt3_max_tokens = 400                              # 最大返回值长度
+gpt3_chat_count_per_day = 100                      # 普通用户每天聊天上限
 ```
 
 ## 图片渲染
