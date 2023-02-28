@@ -1,5 +1,7 @@
-from pydantic import BaseSettings
+from pydantic import BaseSettings, Field
 from nonebot import get_driver
+from typing import List, Optional
+
 from nonebot.rule import to_me
 import yaml
 from pathlib import Path
@@ -7,7 +9,7 @@ from pathlib import Path
 class Config(BaseSettings):
     # Your Config Here
     gpt3_api_key_path: str = "config/chatgpt_api_key.yml"
-    gpt3_api_key_list_from_env: list = ''
+    gpt3_api_key_list_from_env: Optional[list] = Field(default_factory=list)
     gpt3_command_prefix: str = 'gpt3'
     gpt3_need_at: bool = False
     gpt3_image_render: bool = False
@@ -42,7 +44,7 @@ if not Path(gpt3_api_key_path).exists():
 with open(gpt3_api_key_path, 'r', encoding='utf-8') as f:
     api_key_list = yaml.load(f, Loader=yaml.FullLoader).get('api_keys')
     if len(api_key_list) == 0:
-        api_key_list=gpt3_api_key_list_from_env
+        api_key_list = gpt3_api_key_list_from_env
 from nonebot.log import logger
 logger.info(f"加载 {len(api_key_list)}个 APIKeys")
 
