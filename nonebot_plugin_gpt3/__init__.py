@@ -66,8 +66,6 @@ class Session:
 
     # 会话
     async def get_chat_response(self, msg, is_admin) -> str:
-        logger.error(f"{is_admin} {self.chat_count}")
-
         if len(api_key_list) == 0:
             return f'无API Keys，请在 {gpt3_api_key_path} 或者环境变量中配置'
 
