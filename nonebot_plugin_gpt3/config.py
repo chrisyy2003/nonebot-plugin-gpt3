@@ -16,6 +16,7 @@ class Config(BaseSettings):
     gpt3_image_limit: int = 100
     gpt3_max_tokens: int = 400
     gpt3_model : str = 'text-davinci-003'
+    gpt3_chat_count_per_day: int = 100
 
 
     class Config:
@@ -33,6 +34,7 @@ gpt3_image_limit = config.gpt3_image_limit
 gpt3_max_tokens = config.gpt3_max_tokens
 gpt3_model = config.gpt3_model
 gpt3_api_key_list_from_env = config.gpt3_api_key_list_from_env
+gpt3_chat_count_per_day = config.gpt3_chat_count_per_day
 
 # 如果不存在则创建
 LOCAL = Path() / "config"

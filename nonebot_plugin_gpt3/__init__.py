@@ -23,6 +23,7 @@ public_sessionID = 1
 
 
 class Session:
+    chat_count: int = 0
     def __init__(self, id):
         self.session_id = id
         self.preset = default_preset
@@ -62,6 +63,8 @@ class Session:
     async def get_chat_response(self, msg) -> str:
         if len(api_key_list) == 0:
             return f'无API Keys，请在 {gpt3_api_key_path} 或者环境变量中配置'
+        if self.chat_count > gpt3_chat_count_per_day:
+            return f'每日聊天次数达到上限'
 
         if len(self.conversation):
             prompt = self.preset + ''.join(self.conversation) + msg
@@ -91,10 +94,10 @@ class Session:
 
         if ok:
             self.conversation.append(f"{msg}{start_sequence}{res}{restart_sequence}")
+            self.chat_count += 1
         else:
             # 超出长度或者错误自动重置
             self.reset()
-
         return res
 
 
