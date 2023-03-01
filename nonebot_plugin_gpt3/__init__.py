@@ -332,7 +332,7 @@ async def handle_chat(event: MessageEvent, prompt: Message = Arg(), msg: str = A
         await chat_gpt3.reject_arg('prompt', '会话已重置')
 
     if msg not in end_conversation:
-        resp = await get_user_session(session_id).get_chat_response(msg)
+        resp = await get_user_session(session_id).get_chat_response(msg, checker(event))
         resp = await handle_msg(resp)
 
         # 如果是私聊直接发送
