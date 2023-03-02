@@ -147,6 +147,7 @@ gpt3_image_render = False                          # 是否渲染为图片
 gpt3_image_limit = 10                              # 长度超过多少才会渲染成图片
 gpt3_max_tokens = 400                              # 最大返回值长度
 gpt3_chat_count_per_day = 100                      # 普通用户每天聊天上限
+gpt3_model = 'text-davinci-003'                    # 语言模型
 ```
 
 ## 图片渲染
