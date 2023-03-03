@@ -1,6 +1,6 @@
 [tool.poetry]
 name = "nonebot-plugin-gpt3"
-version = "1.0.22"
+version = "1.1.2"
 description = ""
 authors = ["chrisyy <1017975501@qq.com>"]
 readme = "README.md"

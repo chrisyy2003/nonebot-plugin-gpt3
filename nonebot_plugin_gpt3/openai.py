@@ -1,7 +1,9 @@
 import asyncio
-from typing import Awaitable
+from typing import Awaitable, Tuple, Union, Any, List, Generator
 
 import openai
+from openai.openai_object import OpenAIObject
+
 from .config import gpt3_max_tokens, gpt3_model
 from typing import Tuple
 
@@ -13,7 +15,7 @@ def remove_punctuation(text):
     return ""
 
 
-def get_chat_response(key: str, preset: str, conversation: list, msg: str) -> Tuple[list, bool]:
+def get_chat_response(key: str, preset: str, conversation: list, msg: str) -> Tuple[Any, bool]:
     """
     :param key: 密钥
     :param preset: 人格
@@ -36,6 +38,6 @@ def get_chat_response(key: str, preset: str, conversation: list, msg: str) -> Tu
         )
         res: str = remove_punctuation(response.choices[0].message.content.strip())
         conversation.append({"role": "assistant", "content": res})
-        return conversation, True
+        return response, True
     except Exception as e:
         return f"发生错误: {e}", False

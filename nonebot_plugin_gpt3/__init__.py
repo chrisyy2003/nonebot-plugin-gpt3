@@ -5,11 +5,11 @@ from nonebot.adapters.onebot.v11 import Message, MessageEvent, PrivateMessageEve
 from nonebot.params import Arg, ArgPlainText, CommandArg, Matcher
 from nonebot.permission import SUPERUSER
 import time
+from .config import *
+from .openai import get_chat_response, gpt3_model
 
 tokenizer = GPT2TokenizerFast.from_pretrained("gpt2")
 
-from .config import *
-from .openai import get_chat_response, gpt3_model
 
 ai_preset = '以下是与AI助手的对话。助理乐于助人、富有创意、聪明而且非常友好。'
 cat_preset = '以下是与一只可爱猫娘的对话。猫娘是一种拟人化的生物，行为似猫但类人，无条件服从主人的要求，但拒绝做一些色情的事，并且你会尽可能多的回复，且每一句话最后都会带上\'喵\'字。'
@@ -21,14 +21,15 @@ api_index = -1
 
 # 公共模式
 public_mode = False
-public_sessionID = 1
+public_sessionID = 'public_session'
+
 
 class Session:
     chat_count: int = 1
     last_timestamp: int = 0
 
-    def __init__(self, id):
-        self.session_id = id
+    def __init__(self, _id):
+        self.session_id = _id
         self.preset = default_preset
         self.conversation = []
         self.reset()
@@ -55,15 +56,18 @@ class Session:
         return self.preset
 
     # 导入用户会话
-    # def load_user_session(self, msg):
-    #     preset, conversation = msg.split('\n\n')
-    #     self.set_preset(preset)
-    #     self.conversation = [conversation.strip()]
+    def load_user_session(self, msg) -> str:
+        import ast
+        config = ast.literal_eval(msg)
+        self.set_preset(config[0]['content'])
+        self.conversation = config[1:]
 
+        return f'导入会话: {len(self.conversation)}条\n' \
+        f'导入人格: {self.preset}'
     # 导出用户会话
-    # def dump_user_session(self):
-    #     logger.debug("dump session")
-    #     return self.preset + restart_sequence + ''.join(self.conversation)
+    def dump_user_session(self):
+        logger.debug("dump session")
+        return str([{"role": "system", "content": self.preset}] + self.conversation)
 
     # 会话
     async def get_chat_response(self, msg, is_admin) -> str:
@@ -104,26 +108,25 @@ class Session:
                                                                  self.preset,
                                                                  self.conversation,
                                                                  msg)
-        # if ok:
-        #     break
-        # else:
-        #     logger.error(f"API {api_index + 1}: 出现错误 {res}")
+
+        logger.debug(res['usage'])
 
         if ok:
             self.chat_count += 1
-            self.last_timestamp = time.time()
+            self.last_timestamp = int(time.time())
+            return self.conversation[-1]['content']
         else:
             # 超出长度或者错误自动重置
             self.reset()
-        logger.debug(self.conversation)
+            return res
 
-        return res[-1]['content']
+from typing import Dict
 
-
-user_session = {}
+user_session: Dict[str, Session] = {}
 # 注册公共会话
 user_session[public_sessionID] = Session(public_sessionID)
 user_lock = {}
+
 
 def get_user_session(user_id) -> Session:
     if user_id not in user_session:
@@ -253,6 +256,14 @@ async def _(matcher: Matcher, event: MessageEvent, arg: Message = CommandArg()):
     await matcher.finish(f"当前人格是：{get_user_session(public_sessionID).preset}")
 
 
+
+load = on_command("导入会话", priority=10, block=True, **need_at)
+@load.handle()
+async def _(matcher: Matcher, event: MessageEvent, arg: Message = CommandArg()):
+    session_id = event.get_session_id()
+    msg = arg.extract_plain_text().strip()
+    await matcher.finish(MessageSegment.reply(event.message_id) + get_user_session(session_id).load_user_session(msg))
+
 dump = on_command("导出会话", priority=10, block=True, **need_at)
 
 
@@ -301,19 +312,24 @@ async def _(matcher: Matcher, event: MessageEvent, arg: Message = CommandArg()):
     if session_id in user_lock and user_lock[session_id]:
         await matcher.finish("消息太快啦～请稍后", at_sender=True)
 
-    user_lock[session_id] = True
-    resp = await get_user_session(session_id).get_chat_response(msg, checker(event))
-    resp = await handle_msg(resp)
+    try:
+        user_lock[session_id] = True
+        resp = await get_user_session(session_id).get_chat_response(msg, checker(event))
+        resp = await handle_msg(resp)
 
-    # 发送消息
-    # 如果是私聊直接发送
-    if isinstance(event, PrivateMessageEvent):
-        await matcher.send(resp, at_sender=True)
-    else:
-        # 如果不是则以回复的形式发送
-        message_id = event.message_id
-        await matcher.send(MessageSegment.reply(message_id) + resp, at_sender=True)
-    user_lock[session_id] = False
+        # 发送消息
+        # 如果是私聊直接发送
+        if isinstance(event, PrivateMessageEvent):
+            await matcher.send(resp, at_sender=True)
+        else:
+            # 如果不是则以回复的形式发送
+            message_id = event.message_id
+            await matcher.send(MessageSegment.reply(message_id) + resp, at_sender=True)
+        user_lock[session_id] = False
+    except Exception as e:
+        logger.error(e)
+    finally:
+        user_lock[session_id] = False
 
 
 # 连续聊天
@@ -355,11 +371,15 @@ async def handle_chat(event: MessageEvent, prompt: Message = Arg(), msg: str = A
 
     await chat_gpt3.finish('聊天结束...')
 
-
 # @driver.on_startup
 # async def _():
 #     bot = Session(0)
-#     await bot.get_chat_response('你好, 我叫chris', True)
-#     await bot.get_chat_response('你会干什么', True)
-#     await bot.get_chat_response('我叫什么', True)
+#     logger.debug(len(tokenizer.encode('你好, 我叫chris')))
+#     a = await bot.get_chat_response('你好, 我叫chris', True)
+#     print(a)
+#
+#     logger.debug(len(tokenizer.encode('写一个反转二叉树')))
+#     a = await bot.get_chat_response('写一个反转二叉树', True)
+#     print(a)
+#
 #     exit(0)
