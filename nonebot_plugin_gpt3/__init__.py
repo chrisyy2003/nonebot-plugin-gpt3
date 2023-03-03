@@ -1,5 +1,4 @@
 import asyncio
-from transformers import GPT2TokenizerFast
 from nonebot import on_command
 from nonebot.adapters.onebot.v11 import Message, MessageEvent, PrivateMessageEvent, MessageSegment, GroupMessageEvent
 from nonebot.params import Arg, ArgPlainText, CommandArg, Matcher
@@ -7,9 +6,6 @@ from nonebot.permission import SUPERUSER
 import time
 from .config import *
 from .openai import get_chat_response, gpt3_model
-
-tokenizer = GPT2TokenizerFast.from_pretrained("gpt2")
-
 
 ai_preset = '以下是与AI助手的对话。助理乐于助人、富有创意、聪明而且非常友好。'
 cat_preset = '以下是与一只可爱猫娘的对话。猫娘是一种拟人化的生物，行为似猫但类人，无条件服从主人的要求，但拒绝做一些色情的事，并且你会尽可能多的回复，且每一句话最后都会带上\'喵\'字。'
@@ -33,6 +29,8 @@ class Session:
         self.preset = default_preset
         self.conversation = []
         self.reset()
+        self.token_record = []
+        self.total_tokens = 0
 
     # 重置会话
     def reset(self):
@@ -71,9 +69,8 @@ class Session:
 
     # 会话
     async def get_chat_response(self, msg, is_admin) -> str:
-        if len(api_key_list) == 0:
-            return f'无API Keys，请在 {gpt3_api_key_path} 或者环境变量中配置'
-
+        if openai_api_key == '':
+            return f'无API Keys，请在配置文件或者环境变量中配置'
         def check_and_reset() -> bool:
             if is_admin:
                 return False
@@ -89,31 +86,34 @@ class Session:
             if self.chat_count >= gpt3_chat_count_per_day:
                 return True
             return False
-
         if check_and_reset():
             return f'每日聊天次数达到上限'
 
-        # prompt = self.preset + ''.join(self.conversation) + msg
-        # token_len = len(tokenizer.encode(prompt))
-        # while token_len > 4096 - gpt3_max_tokens:
-        #     logger.debug("长度超过4096 - max_token，删除最早的一次会话")
-        #     del self.conversation[0]
-        #     prompt = self.preset + ''.join(self.conversation) + msg
-        #     token_len = len(tokenizer.encode(prompt))
 
-        # logger.debug(f"使用 API: {api_index + 1}，目前token数: {token_len}")
+        # 长度超过4096时，删除最早的一次会话
+        while self.total_tokens > 4096 - gpt3_max_tokens:
+            logger.debug("长度超过4096 - max_token，删除最早的一次会话")
+            self.total_tokens -= self.token_record[0]
+            del self.conversation[0]
+            del self.token_record[0]
 
         res, ok = await asyncio.get_event_loop().run_in_executor(None, get_chat_response,
-                                                                 api_key_list[0],
+                                                                 openai_api_key,
                                                                  self.preset,
                                                                  self.conversation,
                                                                  msg)
-
-        logger.debug(res['usage'])
-
         if ok:
             self.chat_count += 1
             self.last_timestamp = int(time.time())
+            # 输入token数
+            self.token_record.append(res['usage']['prompt_tokens'] - self.total_tokens)
+            # 回答token数
+            self.token_record.append(res['usage']['completion_tokens'])
+            # 总token数
+            self.total_tokens = res['usage']['total_tokens']
+
+            logger.debug(res['usage'])
+            logger.debug(self.token_record)
             return self.conversation[-1]['content']
         else:
             # 超出长度或者错误自动重置
@@ -122,9 +122,9 @@ class Session:
 
 from typing import Dict
 
-user_session: Dict[str, Session] = {}
-# 注册公共会话
-user_session[public_sessionID] = Session(public_sessionID)
+user_session: Dict[str, Session] = {
+    public_sessionID: Session(public_sessionID)
+}
 user_lock = {}
 
 
@@ -155,8 +155,6 @@ def checker(event: GroupMessageEvent) -> bool:
 
 
 switch_mode = on_command("全局会话", priority=10, block=True, **need_at)
-
-
 @switch_mode.handle()
 async def _(matcher: Matcher, event: MessageEvent):
     if not checker(event):
@@ -175,8 +173,6 @@ async def _(matcher: Matcher, event: MessageEvent):
 
 
 switch_img = on_command("图片渲染", priority=10, block=True, permission=SUPERUSER, **need_at)
-
-
 @switch_img.handle()
 async def _(matcher: Matcher):
     global gpt3_image_render
@@ -189,8 +185,6 @@ async def _(matcher: Matcher):
 
 
 reset_c = on_command("重置会话", priority=10, block=True, **need_at)
-
-
 @reset_c.handle()
 async def _(matcher: Matcher, event: MessageEvent):
     session_id = event.get_session_id()
@@ -204,24 +198,20 @@ async def _(matcher: Matcher, event: MessageEvent):
     await matcher.finish("会话已重置")
 
 
+
+
 now_model = on_command("当前模型", priority=10, block=True, **need_at)
-
-now_preset = on_command("当前人格", priority=10, block=True, **need_at)
-
-
-@now_preset.handle()
+@now_model.handle()
 async def _(matcher: Matcher, event: MessageEvent):
     await matcher.finish(f"当前模型：{gpt3_model}")
 
-
+now_preset = on_command("当前人格", priority=10, block=True, **need_at)
 @now_preset.handle()
 async def _(matcher: Matcher, event: MessageEvent):
     await matcher.finish(f"当前人格是：{get_user_session(public_sessionID).preset}")
 
 
 reset = on_command("重置人格", priority=10, block=True, **need_at)
-
-
 @reset.handle()
 async def _(matcher: Matcher, event: MessageEvent):
     session_id = event.get_session_id()
@@ -238,8 +228,6 @@ async def _(matcher: Matcher, event: MessageEvent):
 
 set_preset = on_command("设置人格", aliases={"人格设置", "人格"}, priority=10, block=True, permission=SUPERUSER,
                         **need_at)
-
-
 @set_preset.handle()
 async def _(matcher: Matcher, event: MessageEvent, arg: Message = CommandArg()):
     msg = arg.extract_plain_text().strip()
@@ -265,8 +253,6 @@ async def _(matcher: Matcher, event: MessageEvent, arg: Message = CommandArg()):
     await matcher.finish(MessageSegment.reply(event.message_id) + get_user_session(session_id).load_user_session(msg))
 
 dump = on_command("导出会话", priority=10, block=True, **need_at)
-
-
 @dump.handle()
 async def _(matcher: Matcher, event: MessageEvent):
     session_id = event.get_session_id()
@@ -312,24 +298,19 @@ async def _(matcher: Matcher, event: MessageEvent, arg: Message = CommandArg()):
     if session_id in user_lock and user_lock[session_id]:
         await matcher.finish("消息太快啦～请稍后", at_sender=True)
 
-    try:
-        user_lock[session_id] = True
-        resp = await get_user_session(session_id).get_chat_response(msg, checker(event))
-        resp = await handle_msg(resp)
+    user_lock[session_id] = True
+    resp = await get_user_session(session_id).get_chat_response(msg, checker(event))
+    resp = await handle_msg(resp)
 
-        # 发送消息
-        # 如果是私聊直接发送
-        if isinstance(event, PrivateMessageEvent):
-            await matcher.send(resp, at_sender=True)
-        else:
-            # 如果不是则以回复的形式发送
-            message_id = event.message_id
-            await matcher.send(MessageSegment.reply(message_id) + resp, at_sender=True)
-        user_lock[session_id] = False
-    except Exception as e:
-        logger.error(e)
-    finally:
-        user_lock[session_id] = False
+    # 发送消息
+    # 如果是私聊直接发送
+    if isinstance(event, PrivateMessageEvent):
+        await matcher.send(resp, at_sender=True)
+    else:
+        # 如果不是则以回复的形式发送
+        message_id = event.message_id
+        await matcher.send(MessageSegment.reply(message_id) + resp, at_sender=True)
+    user_lock[session_id] = False
 
 
 # 连续聊天
@@ -371,6 +352,8 @@ async def handle_chat(event: MessageEvent, prompt: Message = Arg(), msg: str = A
 
     await chat_gpt3.finish('聊天结束...')
 
+
+# for test
 # @driver.on_startup
 # async def _():
 #     bot = Session(0)

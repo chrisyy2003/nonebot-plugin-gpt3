@@ -11,11 +11,8 @@ python = "^3.8"
 nonebot2 = "^2.0.0rc2"
 nonebot-adapter-onebot = "^2.1.5"
 
-openai = "^0.25.0"
-transformers = "^4.25.1"
-pyyaml = "^6.0"
-nonebot-plugin-htmlrender="^0.2.0.1"
-
+openai = "^0.27.0"
+nonebot-plugin-htmlrender="^0.2.0.3"
 
 [build-system]
 requires = ["poetry-core"]
