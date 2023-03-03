@@ -15,7 +15,7 @@ class Config(BaseSettings):
     gpt3_image_render: bool = False
     gpt3_image_limit: int = 100
     gpt3_max_tokens: int = 400
-    gpt3_model : str = 'text-davinci-003'
+    gpt3_model : str = 'gpt-3.5-turbo'
     gpt3_chat_count_per_day: int = 1000
 
 

@@ -140,7 +140,7 @@ export GPT3_API_KEY_LIST_FROM_ENV=["xxx","yyy"]
 之后是一些自定义配置，根据注释可以自行修改，如果需要请在对应的配置文件下进行配置。
 
 ```
-gpt3_api_key_path = "config/chatgpt_api_key.yml"   # api文件的路径
+gpt3_api_key_path = "config/chatgpt_api_key.yml"   # Api Keys文件的路径
 gpt3_command_prefix = "gpt3"                       # 基本会话中的指令前缀
 gpt3_need_at = False                               # 是否需要@才触发命令
 gpt3_image_render = False                          # 是否渲染为图片
