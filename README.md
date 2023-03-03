@@ -8,7 +8,7 @@
 <div align="center">
 
 # Nonebot-plugin-gpt3
-
+## 3.3日更新: 支持gpt-3.5-turbo模型
 _✨ 基于OpenAI 官方API的对话插件 ✨_
 
 <p align="center">
@@ -19,8 +19,6 @@ _✨ 基于OpenAI 官方API的对话插件 ✨_
       <img src="https://img.shields.io/pypi/dm/nonebot-plugin-gpt3" alt="pypi download">
   </a>
 </p>
-## 3.3更新: 支持gpt-3.5-turbo模型
-
 </div>
 
 # 功能
