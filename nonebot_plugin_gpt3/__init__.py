@@ -116,7 +116,7 @@ class Session:
             logger.debug(self.token_record)
             return self.conversation[-1]['content']
         else:
-            # 超出长度或者错误自动重置
+            # 出现错误自动重置
             self.reset()
             return res
 

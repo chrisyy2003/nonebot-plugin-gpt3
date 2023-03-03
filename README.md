@@ -7,9 +7,9 @@
 
 <div align="center">
 
-# Nnonebot-plugin-gpt3
+# Nonebot-plugin-gpt3
 
-_✨ 基于openai GPT3官方API的对话插件 ✨_
+_✨ 基于OpenAI 官方API的对话插件 ✨_
 
 <p align="center">
   <img src="https://img.shields.io/github/license/EtherLeaF/nonebot-plugin-colab-novelai" alt="license">
@@ -111,43 +111,32 @@ pip install nonebot-plugin-gpt3 -U
 nonebot.load_plugin('nonebot_plugin_gpt3')
 ```
 
-**windows用户还需要安装一个rust环境，[点击这里下载安装](https://file.chrisyy.top/rustup-setup.exe)。**
-
 # 配置
 
-对于官方openai接口只需配置API Keys即可，所以请填写API在您配置的`chatgpt_token_path`下面，默认路径是`config/chatgpt_api_key.yml`
-
-文件内格式如下，有多个Key请按照如下格式配置。
+对于官方OpenAI接口只需配置API Keys即可，所以请填写API在您的配置文件中配置API KEYS
 
 ```
-api_keys: [
-	"xxx",
-	"yyy"
-]
+openai_api_key = "xxx"                             # API密钥
 ```
 
-此外可以通过`.env`文件或者环境变量配置, 优先级分别是`config/chatgpt_api_key` --> 环境变量 --> `.env`
-eg1. (`.env文件`)
+此外可以通过环境变量配置，例如在Linux命令行中输入如下命令之后，直接启动即可
 
 ```
-GPT3_API_KEY_LIST_FROM_ENV=["xxx","yyy"]
-```
-eg2. (Linux 环境变量)
-```
-export GPT3_API_KEY_LIST_FROM_ENV=["xxx","yyy"]
+openai_api_key="xxx"
 ```
 
 之后是一些自定义配置，根据注释可以自行修改，如果需要请在对应的配置文件下进行配置。
 
 ```
-gpt3_api_key_path = "config/chatgpt_api_key.yml"   # Api Keys文件的路径
-gpt3_command_prefix = "gpt3"                       # 基本会话中的指令前缀
+gpt3_command_prefix = "."                          # 基本会话中的指令前缀
+openai_api_key = "xxx"                             # API密钥
+
 gpt3_need_at = False                               # 是否需要@才触发命令
 gpt3_image_render = False                          # 是否渲染为图片
-gpt3_image_limit = 10                              # 长度超过多少才会渲染成图片
-gpt3_max_tokens = 400                              # 最大返回值长度
-gpt3_chat_count_per_day = 100                      # 普通用户每天聊天上限
-gpt3_model = 'text-davinci-003'                    # 语言模型
+gpt3_image_limit = 150                             # 长度超过多少才会渲染成图片
+gpt3_max_tokens = 1000                             # 回答内容最大长度
+gpt3_chat_count_per_day = 150                      # 普通用户每天聊天次数上限
+gpt3_model = 'gpt-3.5-turbo'                       # 语言模型
 ```
 
 ## 图片渲染
