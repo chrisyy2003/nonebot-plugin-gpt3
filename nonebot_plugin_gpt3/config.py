@@ -36,19 +36,12 @@ gpt3_model = config.gpt3_model
 # gpt3_api_key_list_from_env = config.gpt3_api_key_list_from_env
 gpt3_chat_count_per_day = config.gpt3_chat_count_per_day
 
-# 如果不存在则创建
-# LOCAL = Path() / "config"
-# LOCAL.mkdir(exist_ok=True)
-# if not Path(gpt3_api_key_path).exists():
-#     with open(gpt3_api_key_path, 'w', encoding='utf-8') as f:
-#         yaml.dump({"api_keys": []}, f, allow_unicode=True)
-#
-# with open(gpt3_api_key_path, 'r', encoding='utf-8') as f:
-#     api_key_list = yaml.load(f, Loader=yaml.FullLoader).get('api_keys')
-#     if len(api_key_list) == 0:
-#         api_key_list = gpt3_api_key_list_from_env
+
 from nonebot.log import logger
-logger.info(f"加载api keys: {openai_api_key}")
+if openai_api_key:
+    logger.info(f"加载api keys: {openai_api_key}")
+else:
+    logger.warning('没有配置api key')
 
 # 基本会话
 matcher_params = {}
