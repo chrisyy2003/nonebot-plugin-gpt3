@@ -68,7 +68,7 @@ _✨ 基于OpenAI 官方API的对话插件 ✨_
 
 同样也可以手动指定人格
 
-<img src="https://chrisyy-images.oss-cn-chengdu.aliyuncs.com/img/image-20221217232155100.png" width="40%" />
+<img src="https://chrisyy-images.oss-cn-chengdu.aliyuncs.com/img/202303061532626.png" width="40%" />
 
 ## 切换群聊
 
