@@ -1,6 +1,6 @@
 [tool.poetry]
 name = "nonebot-plugin-gpt3"
-version = "1.1.5"
+version = "1.1.6"
 description = ""
 authors = ["chrisyy <1017975501@qq.com>"]
 readme = "README.md"
@@ -12,6 +12,7 @@ nonebot2 = "^2.0.0rc2"
 nonebot-adapter-onebot = "^2.1.5"
 
 openai = "^0.27.0"
+tiktoken = "0.3.0"
 nonebot-plugin-htmlrender="^0.2.0.3"
 
 [build-system]
