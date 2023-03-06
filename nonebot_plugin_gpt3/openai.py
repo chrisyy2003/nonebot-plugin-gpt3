@@ -3,6 +3,8 @@ from typing import Awaitable, Tuple, Union, Any, List, Generator
 
 import openai
 from openai.openai_object import OpenAIObject
+from nonebot.utils import run_sync
+
 
 from .config import gpt3_max_tokens, gpt3_model
 from typing import Tuple
@@ -14,7 +16,7 @@ def remove_punctuation(text):
             return text[i:]
     return ""
 
-
+@run_sync
 def get_chat_response(key: str, preset: str, conversation: list, msg: str) -> Tuple[Any, bool]:
     """
     :param key: 密钥

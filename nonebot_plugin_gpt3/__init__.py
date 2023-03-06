@@ -26,7 +26,7 @@ class Session:
 
     def __init__(self, _id):
         self.session_id = _id
-        self.preset = default_preset
+        self.preset = ''
         self.conversation = []
         self.reset()
         self.token_record = []
@@ -61,7 +61,8 @@ class Session:
         self.conversation = config[1:]
 
         return f'导入会话: {len(self.conversation)}条\n' \
-        f'导入人格: {self.preset}'
+               f'导入人格: {self.preset}'
+
     # 导出用户会话
     def dump_user_session(self):
         logger.debug("dump session")
@@ -71,6 +72,7 @@ class Session:
     async def get_chat_response(self, msg, is_admin) -> str:
         if openai_api_key == '':
             return f'无API Keys，请在配置文件或者环境变量中配置'
+
         def check_and_reset() -> bool:
             if is_admin:
                 return False
@@ -86,9 +88,9 @@ class Session:
             if self.chat_count >= gpt3_chat_count_per_day:
                 return True
             return False
+
         if check_and_reset():
             return f'每日聊天次数达到上限'
-
 
         # 长度超过4096时，删除最早的一次会话
         while self.total_tokens > 4096 - gpt3_max_tokens:
@@ -97,11 +99,10 @@ class Session:
             del self.conversation[0]
             del self.token_record[0]
 
-        res, ok = await asyncio.get_event_loop().run_in_executor(None, get_chat_response,
-                                                                 openai_api_key,
-                                                                 self.preset,
-                                                                 self.conversation,
-                                                                 msg)
+        res, ok = await get_chat_response(openai_api_key,
+                                          self.preset,
+                                          self.conversation,
+                                          msg)
         if ok:
             self.chat_count += 1
             self.last_timestamp = int(time.time())
@@ -119,6 +120,7 @@ class Session:
             # 出现错误自动重置
             self.reset()
             return res
+
 
 from typing import Dict
 
@@ -155,6 +157,8 @@ def checker(event: GroupMessageEvent) -> bool:
 
 
 switch_mode = on_command("全局会话", priority=10, block=True, **need_at)
+
+
 @switch_mode.handle()
 async def _(matcher: Matcher, event: MessageEvent):
     if not checker(event):
@@ -173,6 +177,8 @@ async def _(matcher: Matcher, event: MessageEvent):
 
 
 switch_img = on_command("图片渲染", priority=10, block=True, permission=SUPERUSER, **need_at)
+
+
 @switch_img.handle()
 async def _(matcher: Matcher):
     global gpt3_image_render
@@ -185,6 +191,8 @@ async def _(matcher: Matcher):
 
 
 reset_c = on_command("重置会话", priority=10, block=True, **need_at)
+
+
 @reset_c.handle()
 async def _(matcher: Matcher, event: MessageEvent):
     session_id = event.get_session_id()
@@ -198,20 +206,25 @@ async def _(matcher: Matcher, event: MessageEvent):
     await matcher.finish("会话已重置")
 
 
-
-
 now_model = on_command("当前模型", priority=10, block=True, **need_at)
+
+
 @now_model.handle()
 async def _(matcher: Matcher, event: MessageEvent):
     await matcher.finish(f"当前模型：{gpt3_model}")
 
+
 now_preset = on_command("当前人格", priority=10, block=True, **need_at)
+
+
 @now_preset.handle()
 async def _(matcher: Matcher, event: MessageEvent):
     await matcher.finish(f"当前人格是：{get_user_session(public_sessionID).preset}")
 
 
 reset = on_command("重置人格", priority=10, block=True, **need_at)
+
+
 @reset.handle()
 async def _(matcher: Matcher, event: MessageEvent):
     session_id = event.get_session_id()
@@ -228,6 +241,8 @@ async def _(matcher: Matcher, event: MessageEvent):
 
 set_preset = on_command("设置人格", aliases={"人格设置", "人格"}, priority=10, block=True, permission=SUPERUSER,
                         **need_at)
+
+
 @set_preset.handle()
 async def _(matcher: Matcher, event: MessageEvent, arg: Message = CommandArg()):
     msg = arg.extract_plain_text().strip()
@@ -244,15 +259,19 @@ async def _(matcher: Matcher, event: MessageEvent, arg: Message = CommandArg()):
     await matcher.finish(f"当前人格是：{get_user_session(public_sessionID).preset}")
 
 
-
 load = on_command("导入会话", priority=10, block=True, **need_at)
+
+
 @load.handle()
 async def _(matcher: Matcher, event: MessageEvent, arg: Message = CommandArg()):
     session_id = event.get_session_id()
     msg = arg.extract_plain_text().strip()
     await matcher.finish(MessageSegment.reply(event.message_id) + get_user_session(session_id).load_user_session(msg))
 
+
 dump = on_command("导出会话", priority=10, block=True, **need_at)
+
+
 @dump.handle()
 async def _(matcher: Matcher, event: MessageEvent):
     session_id = event.get_session_id()
@@ -351,7 +370,6 @@ async def handle_chat(event: MessageEvent, prompt: Message = Arg(), msg: str = A
             await chat_gpt3.reject_arg('prompt', MessageSegment.reply(message_id) + resp)
 
     await chat_gpt3.finish('聊天结束...')
-
 
 # for test
 # @driver.on_startup
