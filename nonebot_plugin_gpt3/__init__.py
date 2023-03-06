@@ -92,8 +92,10 @@ class Session:
         if check_and_reset():
             return f'每日聊天次数达到上限'
 
+        import tiktoken
+        encoding = tiktoken.encoding_for_model(gpt3_model)
         # 长度超过4096时，删除最早的一次会话
-        while self.total_tokens > 4096 - gpt3_max_tokens:
+        while self.total_tokens + len(encoding.encode(msg)) > 4096 - gpt3_max_tokens:
             logger.debug("长度超过4096 - max_token，删除最早的一次会话")
             self.total_tokens -= self.token_record[0]
             del self.conversation[0]
