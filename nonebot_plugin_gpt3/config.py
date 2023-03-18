@@ -1,3 +1,4 @@
+import yaml
 from pydantic import BaseSettings, Field
 from nonebot import get_driver
 from nonebot.log import logger
@@ -26,6 +27,8 @@ driver = get_driver()
 global_config = driver.config
 config = Config.parse_obj(global_config)
 
+with open('config/prompts.yml', encoding='utf-8') as f:
+    prompts = yaml.safe_load(f)
 # gpt3_api_key_path = config.gpt3_api_key_path
 openai_api_key = config.openai_api_key
 gpt3_command_prefix = config.gpt3_command_prefix
