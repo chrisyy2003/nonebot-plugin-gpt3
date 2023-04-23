@@ -43,10 +43,13 @@ async def get_chat_response(proxy: str, key: str, preset: str, conversation: lis
             },
         )
         response = response.json()
-        res: str = remove_punctuation(response['choices'][0]['message']['content'].strip())
-        conversation.append({"role": "assistant", "content": res})
-        return response, True
+        try:
+            res: str = remove_punctuation(response['choices'][0]['message']['content'].strip())
+            conversation.append({"role": "assistant", "content": res})
+            return response, True
+        except:
+            return response, False
     except httpx.ConnectTimeout as e:
         return f"发生HTTP超时错误: {e.request.url}", False
     except Exception as e:
-        return f"发生未知错误: {type(e)}", False
+        return f"发生未知错误: {type(e)} {e}", False

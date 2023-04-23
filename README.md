@@ -130,8 +130,8 @@ gpt3_command_prefix = "."                          # 基本会话中的指令前
 openai_api_key = "xxx"                             # API密钥
 
 # 默认人格
-gpt3_default_preset = "你叫鸡哥，是一个唱跳rap篮球的高手，并且每句话后都会带上厉不厉害你鸡哥!"
-gpt3_proxy = "http://127.0.0.1:6152"               # 代理地址
+gpt3_default_preset = "以下是与一个叫鸡哥的篮球高手的对话。你叫鸡哥，是一个唱跳rap篮球的高手，并且每句话后会带上厉不厉害你鸡哥!"
+gpt3_proxy = "http://127.0.0.1:7890"               # 代理地址
 gpt3_need_at = False                               # 是否需要@才触发命令
 gpt3_image_render = False                          # 是否渲染为图片
 gpt3_image_limit = 150                             # 长度超过多少才会渲染成图片

@@ -376,12 +376,8 @@ async def handle_chat(event: MessageEvent, prompt: Message = Arg(), msg: str = A
 # @driver.on_startup
 # async def _():
 #     bot = Session(0)
-#     logger.debug(len(tokenizer.encode('你好, 我叫chris')))
-#     a = await bot.get_chat_response('你好, 我叫chris', True)
-#     print(a)
-#
-#     logger.debug(len(tokenizer.encode('写一个反转二叉树')))
+#     res = await bot.get_chat_response('你好, 我叫chris', True)
+#     print(res)
 #     a = await bot.get_chat_response('写一个反转二叉树', True)
-#     print(a)
-#
+#     print(res)
 #     exit(0)
