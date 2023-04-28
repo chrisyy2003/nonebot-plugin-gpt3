@@ -62,7 +62,7 @@ _✨ 基于OpenAI 官方API的对话插件 ✨_
 
 ## 人格设置
 
-预设了**AI助手/猫娘/nsfw猫娘**三种人格，可以通过人格设置切换。内置的设定可以从[这里看到](https://github.com/chrisyy2003/lingyin-bot/blob/main/plugins/gpt3/nonebot_plugin_gpt3/__init__.py#L16-L18)。
+预设了**助手/喵喵/猫娘/女仆/姐姐/H猫娘/雌小鬼/AI绘画**八种人格，可以通过人格设置切换。内置的设定可以在config/prompts.yml看到。
 
 <img src="https://chrisyy-images.oss-cn-chengdu.aliyuncs.com/img/image-20221217231703614.png" width="40%" />
 
